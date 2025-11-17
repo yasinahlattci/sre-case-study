@@ -10,7 +10,6 @@ import (
 	"github.com/yasinahlattci/sre-case-study/api/internal/service"
 )
 
-
 type Handler struct {
 	dbService *service.DynamoDBService
 }
@@ -52,7 +51,7 @@ func (h *Handler) PutItemHandler(c *fiber.Ctx) error {
 	var req struct {
 		Data interface{} `json:"data"`
 	}
-	
+
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -83,7 +82,7 @@ func (h *Handler) PutItemHandler(c *fiber.Ctx) error {
 func (h *Handler) ListItemsHandler(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	items, err := h.dbService.ListItems(ctx)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

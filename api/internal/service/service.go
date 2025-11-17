@@ -2,20 +2,21 @@ package service
 
 import (
 	"context"
+
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-type DynamoDBService struct{
+type DynamoDBService struct {
 	client *dynamodb.Client
-	table string
+	table  string
 }
 
-func NewDynamoDBService(client *dynamodb.Client, table string) (*DynamoDBService) {
+func NewDynamoDBService(client *dynamodb.Client, table string) *DynamoDBService {
 	return &DynamoDBService{
 		client: client,
-		table: table,
+		table:  table,
 	}
 }
 
@@ -27,12 +28,12 @@ func (s *DynamoDBService) PutItem(ctx context.Context, objectID string, data int
 	}
 	input := &dynamodb.PutItemInput{
 		TableName: &s.table,
-		Item:      map[string]types.AttributeValue{
+		Item: map[string]types.AttributeValue{
 			"objectID": &types.AttributeValueMemberS{Value: objectID},
 			"data":     av,
 		},
 	}
-	
+
 	_, err = s.client.PutItem(ctx, input)
 	return err
 }

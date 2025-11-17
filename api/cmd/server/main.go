@@ -27,13 +27,12 @@ func main() {
 
 	service := service.NewDynamoDBService(dynamoClient, tableName)
 	handler := handler.NewHandler(service)
-	
+
 	router.SetupRoutes(app, handler)
 
 	port := config.Server.Port
 	if err := app.Listen(port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-
 
 }
