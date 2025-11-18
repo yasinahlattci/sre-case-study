@@ -7,14 +7,18 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/yasinahlattci/sre-case-study/api/internal/service"
 )
 
+type ServiceInterface interface {
+	GetItem(ctx context.Context, objectID string) (interface{}, error)
+	PutItem(ctx context.Context, objectID string, data interface{}) error
+	ListItems(ctx context.Context) ([]map[string]interface{}, error)
+}
 type Handler struct {
-	dbService *service.DynamoDBService
+	dbService ServiceInterface
 }
 
-func NewHandler(s *service.DynamoDBService) *Handler {
+func NewHandler(s ServiceInterface) *Handler {
 	return &Handler{
 		dbService: s,
 	}
