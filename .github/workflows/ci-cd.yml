@@ -1,0 +1,114 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GO_VERSION: '1.25.3'
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: sre-case-study
+  ECS_SERVICE: picus-service
+  ECS_CLUSTER: sre-case-study-cluster
+  ECS_TASK_DEFINITION: sre-case-study-task
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: api/go.sum
+
+      - name: Install go modules
+        working-directory: ./api
+        run: go mod download
+
+      - name: Run Test
+        working-directory: ./api
+        run: go test -v -race ./...
+      
+      #- name: Lint
+      #  uses: golangci/golangci-lint-action@v4
+      #  with:
+      #    version: v2.6.2
+      #    working-directory: ./api
+
+  go-build:
+    name: Go build
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: api/go.sum
+
+      - name: Install go modules
+        working-directory: ./api
+        run: go mod download
+
+      - name: Build Api
+        working-directory: ./api
+        run: GOOS=linux GOARCH=amd64 go build -o server ./cmd/server/main.go
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api
+          path: ./api/server
+
+  docker-build-and-push:
+    name: Docker Build and Push to ECR
+    runs-on: ubuntu-latest
+    needs: go-build
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: api
+
+      - name: Build and Push
+        working-directory: ./api
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          mv ../server .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

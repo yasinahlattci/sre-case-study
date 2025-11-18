@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+README.md
+LICENSE
+
+# Test files
+*_test.go
+coverage.out
+coverage.html
+
+# Build artifacts
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Lambda deployment
+lambda-deploy/
+
+# Terraform
+infrastructure/
+*.tf
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Config (keep only necessary)
+!.conf/
