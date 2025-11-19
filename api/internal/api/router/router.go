@@ -7,6 +7,9 @@ import (
 
 func SetupRoutes(app *fiber.App, h *handler.Handler) {
 
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusOK)
+	})
 	api := app.Group("/picus")
 
 	api.Get("list", h.ListItemsHandler)
