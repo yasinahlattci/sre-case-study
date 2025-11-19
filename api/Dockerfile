@@ -7,6 +7,8 @@ WORKDIR /app
 
 COPY ./server server
 
+RUN chmod +x /app/server
+
 COPY ./.conf .conf
 
 RUN chown -R app:app /app
