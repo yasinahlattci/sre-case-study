@@ -13,6 +13,7 @@ env:
   ECS_SERVICE: sre-case-study-service
   ECS_CLUSTER: sre-case-study
   ECS_TASK_DEFINITION: sre-case-study-task
+  LAMBDA_FUNCTION_NAME: sre-case-study-lambda
 
 jobs:
 
@@ -230,3 +231,14 @@ jobs:
       - name: Terraform Apply
         working-directory: ./infrastructure/terraform/sre-case-study-lambda
         run: terraform apply -auto-approve
+
+      - name: Verify Lambda Deployment
+        run: |
+          expected_image_tag="${{ github.sha }}"
+          deployed_image_uri=$(aws lambda get-function --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --query 'Configuration.Code.ImageUri' --output text)
+          if [[ "$deployed_image_uri" != *"$expected_image_tag"* ]]; then
+            echo "Deployed image tag does not match expected tag."
+            exit 1
+          else
+            echo "Lambda deployment verified successfully."
+          fi

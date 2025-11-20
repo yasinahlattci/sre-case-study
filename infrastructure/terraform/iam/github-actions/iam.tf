@@ -96,7 +96,10 @@ data "aws_iam_policy_document" "github_permissions" {
       "lambda:GetFunction",
       "lambda:AddPermission",
       "lambda:RemovePermission",
-      "lambda:InvokeFunction"
+      "lambda:InvokeFunction",
+      "lambda:ListVersionsByFunction",
+      "lambda:GetPolicy",
+      "lambda:GetFunctionConfiguration"
     ]
     resources = ["*"]
   }
@@ -109,7 +112,8 @@ data "aws_iam_policy_document" "github_permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "logs:DescribeLogStreams",
-      "logs:DescribeLogGroups"
+      "logs:DescribeLogGroups",
+      "logs:ListTagsForResource"
     ]
     resources = ["*"]
   }
@@ -118,7 +122,63 @@ data "aws_iam_policy_document" "github_permissions" {
     sid    = "PassRole"
     effect = "Allow"
     actions = [
-      "iam:PassRole"
+      "iam:PassRole",
+      "iam:GetRole",
+      "iam:GetPolicy",
+      "iam:ListRolePolicies",
+      "iam:GetPolicyVersion",
+      "iam:ListAttachedRolePolicies"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "S3TerraformState"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::yahlatci-terraform-states",
+      "arn:aws:s3:::yahlatci-terraform-states/*"
+    ]
+  }
+
+  statement {
+    sid = "Ec2"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSecurityGroupRules",
+
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "ApplicationAutoScaling"
+    effect = "Allow"
+    actions = [
+      "application-autoscaling:RegisterScalableTarget",
+      "application-autoscaling:DeregisterScalableTarget",
+      "application-autoscaling:DescribeScalableTargets",
+      "application-autoscaling:PutScalingPolicy",
+      "application-autoscaling:DeleteScalingPolicy",
+      "application-autoscaling:DescribeScalingPolicies",
+      "application-autoscaling:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "ElasticLoadBalancing"
+    effect = "Allow"
+    actions = [
+      "elasticloadbalancing:DescribeTargetHealth"
     ]
     resources = ["*"]
   }

@@ -103,5 +103,9 @@ func (h *Handler) ListItemsHandler(c *fiber.Ctx) error {
 			"error": "Failed to list items",
 		})
 	}
+	
+	if items == nil {
+		items = []map[string]interface{}{}
+	}
 	return c.Status(200).JSON(items)
 }
