@@ -11,7 +11,7 @@ env:
   ECR_REPOSITORY_API: sre-case-study-api
   ECR_REPOSITORY_LAMBDA: sre-case-study-lambda
   ECS_SERVICE: sre-case-study-service
-  ECS_CLUSTER: sre-case-study-cluster
+  ECS_CLUSTER: sre-case-study
   ECS_TASK_DEFINITION: sre-case-study-task
 
 jobs:
@@ -196,3 +196,37 @@ jobs:
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER }} \
             --services ${{ env.ECS_SERVICE }}
+
+  deploy-lambda:
+    name: Deploy Lambda
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_image_tag: ${{ github.sha }}
+    needs:
+      - docker-build-and-push-lambda
+      - docker-build-and-push-api
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: 1.13.5
+
+      - name: Terraform Init
+        working-directory: ./infrastructure/terraform/sre-case-study-lambda
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./infrastructure/terraform/sre-case-study-lambda
+        run: terraform apply -auto-approve
