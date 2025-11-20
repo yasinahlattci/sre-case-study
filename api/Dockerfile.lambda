@@ -1,11 +1,11 @@
 FROM public.ecr.aws/lambda/provided:al2023
 
-WORKDIR /app
+WORKDIR /var/runtime
 
-COPY ./main main
+COPY ./bootstrap bootstrap
 
 COPY ./.conf .conf
 
-RUN chmod +x /app/main
+RUN chmod +x bootstrap
 
-CMD ["/app/main"]
+CMD ["bootstrap"]
