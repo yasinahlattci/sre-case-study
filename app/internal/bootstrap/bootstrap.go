@@ -18,6 +18,10 @@ type Dependencies struct {
 func Bootstrap(env string) (*Dependencies, error) {
 	logger := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
+	if env == "" {
+		env = "local"
+	}
+
 	cfg, err := config.LoadConfig(".conf", env)
 
 	if err != nil {
