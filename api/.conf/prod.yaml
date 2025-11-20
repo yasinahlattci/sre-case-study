@@ -1,0 +1,6 @@
+server:
+  port: ":3000"
+
+database:
+  region: "eu-west-1"
+  tableName: "picusv4"
