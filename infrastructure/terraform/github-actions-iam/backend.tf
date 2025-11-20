@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "yahlatci-terraform-states"
-    key    = "sre-case-study/terraform.tfstate"
+    key    = "github-actions-iam/terraform.tfstate"
     region = "eu-west-1"
   }
 }
