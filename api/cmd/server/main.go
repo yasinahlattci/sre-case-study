@@ -14,25 +14,28 @@ import (
 
 func main() {
 
+	logger := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
 	config, err := config.LoadConfig(".conf", os.Getenv("APP_ENV"))
 
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		logger.Fatalf("Failed to load config: %v", err)
 	}
-
+	
 	app := fiber.New()
 
 	dynamoClient := db.GetClient(config.Database.Region)
 	tableName := config.Database.TableName
 
 	service := service.NewDynamoDBService(dynamoClient, tableName)
-	handler := handler.NewHandler(service)
+
+	handler := handler.NewHandler(service, logger)
 
 	router.SetupRoutes(app, handler)
 
 	port := config.Server.Port
 	if err := app.Listen(port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		logger.Fatalf("Failed to start server: %v", err)
 	}
 
 }
