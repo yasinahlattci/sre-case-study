@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/yasinahlattci/sre-case-study/api/internal/bootstrap"
+	"github.com/yasinahlattci/sre-case-study/app/internal/bootstrap"
 )
-
 
 func albResponse(statusCode int, success bool, message string) events.ALBTargetGroupResponse {
 	b, _ := json.Marshal(map[string]interface{}{
@@ -20,9 +19,9 @@ func albResponse(statusCode int, success bool, message string) events.ALBTargetG
 		"message": message,
 	})
 	return events.ALBTargetGroupResponse{
-		StatusCode: statusCode,
+		StatusCode:        statusCode,
 		StatusDescription: fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode)),
-		Body:       string(b),
+		Body:              string(b),
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
@@ -30,7 +29,7 @@ func albResponse(statusCode int, success bool, message string) events.ALBTargetG
 }
 
 func deleteHandler(ctx context.Context, request events.ALBTargetGroupRequest) (events.ALBTargetGroupResponse, error) {
-	
+
 	deps, err := bootstrap.Bootstrap(os.Getenv("APP_ENV"))
 
 	if err != nil {
