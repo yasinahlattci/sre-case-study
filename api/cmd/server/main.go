@@ -7,35 +7,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/yasinahlattci/sre-case-study/api/internal/api/handler"
 	"github.com/yasinahlattci/sre-case-study/api/internal/api/router"
-	"github.com/yasinahlattci/sre-case-study/api/internal/config"
-	"github.com/yasinahlattci/sre-case-study/api/internal/db"
-	"github.com/yasinahlattci/sre-case-study/api/internal/service"
+	"github.com/yasinahlattci/sre-case-study/api/internal/bootstrap"
 )
 
 func main() {
 
-	logger := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	config, err := config.LoadConfig(".conf", os.Getenv("APP_ENV"))
-
-	if err != nil {
-		logger.Fatalf("Failed to load config: %v", err)
+	deps, err := bootstrap.Bootstrap(os.Getenv("APP_ENV"))
+	if  err != nil {
+		log.Fatalf("Failed to bootstrap dependencies: %v", err)
 	}
 	
 	app := fiber.New()
 
-	dynamoClient := db.GetClient(config.Database.Region)
-	tableName := config.Database.TableName
 
-	service := service.NewDynamoDBService(dynamoClient, tableName)
-
-	handler := handler.NewHandler(service, logger)
+	handler := handler.NewHandler(deps.Service, deps.Logger)
 
 	router.SetupRoutes(app, handler)
 
-	port := config.Server.Port
+	port := deps.Config.Server.Port
 	if err := app.Listen(port); err != nil {
-		logger.Fatalf("Failed to start server: %v", err)
+		deps.Logger.Fatalf("Failed to start server: %v", err)
 	}
 
 }

@@ -94,3 +94,15 @@ func (s *DynamoDBService) ListItems(ctx context.Context) ([]map[string]interface
 	}
 	return items, nil
 }
+
+func (s *DynamoDBService) DeleteItem(ctx context.Context, objectID string) error {
+	input := &dynamodb.DeleteItemInput{
+		TableName: &s.table,
+		Key: map[string]types.AttributeValue{
+			"objectID": &types.AttributeValueMemberS{Value: objectID},
+		},
+	}
+
+	_, err := s.client.DeleteItem(ctx, input)
+	return err
+}

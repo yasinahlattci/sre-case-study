@@ -1,0 +1,11 @@
+FROM public.ecr.aws/lambda/provided:al2023
+
+WORKDIR /app
+
+COPY ./main main
+
+COPY ./.conf .conf
+
+RUN chmod +x /app/main
+
+CMD ["/app/main"]
