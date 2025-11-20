@@ -43,5 +43,6 @@ module "ecs-service" {
     ecs_cluster_arn = data.terraform_remote_state.ecs.outputs.ecs_cluster_arn
     target_group_arn = data.terraform_remote_state.alb.outputs.api_target_group_arn
     alb_security_group_id = data.terraform_remote_state.alb.outputs.alb_security_group_id
-    image_uri = "887495603804.dkr.ecr.eu-west-1.amazonaws.com/sre-case-study-api:b3c1f401fdfe6a199590c662014295c26057a11e"
+    image_uri = "887495603804.dkr.ecr.eu-west-1.amazonaws.com/sre-case-study-api"
+    image_tag = var.image_tag
 }

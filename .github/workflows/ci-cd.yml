@@ -160,7 +160,7 @@ jobs:
   deploy-api:
     name: Deploy Api to ECS
     runs-on: ubuntu-latest
-    variables:
+    env:
       TF_VAR_image_tag: ${{ github.sha }}
     needs:
       - docker-build-and-push-api

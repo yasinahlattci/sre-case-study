@@ -10,6 +10,11 @@ variable "image_uri" {
   type        = string
 }
 
+variable "image_tag" {
+  description = "The tag of the Docker image for the ECS service"
+  type        = string
+}
+
 variable "target_group_arn" {
   description = "The ARN of the target group to attach the ECS service to"
   type        = string

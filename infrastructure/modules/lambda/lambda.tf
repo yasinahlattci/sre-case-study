@@ -4,7 +4,7 @@ module "lambda" {
   function_name  = "${var.name}-lambda"
   create_package = false
   publish        = true
-  image_uri = var.lambda_image
+  image_uri = "${var.image_uri}:${var.image_tag}"
   package_type = "Image"
   create_role = false
   lambda_role = var.lambda_role_arn

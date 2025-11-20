@@ -45,7 +45,7 @@ module "ecs_service" {
   container_definitions = {
     api = {
       name      = "sre-case-study-api"
-      image     = var.image_uri
+      image     = "${var.image_uri}:${var.image_tag}"
       essential = true
       healthCheck = {
         command     = ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]

@@ -5,9 +5,15 @@ variable "region" {
   default     = "eu-west-1"
 }
 
-variable "lambda_image" {
+variable "image_uri" {
   description = "The ECR image URI for the Lambda function"
   type        = string
+}
+
+variable "image_tag" {
+  description = "The image tag for the Lambda function"
+  type        = string
+  default     = "latest"
 }
 
 variable "target_group_arn" {
