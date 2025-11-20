@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "github_assume_role" {
 }
 
 resource "aws_iam_role" "github_actions" {
-  name               = "github-actions-oidc-role"
+  name               = "GithubActionsOidcRole"
   assume_role_policy = data.aws_iam_policy_document.github_assume_role.json
 
 }
@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "github_permissions" {
 
 
 resource "aws_iam_policy" "github_actions" {
-  name   = "github-actions-policy"
+  name   = "GithubActionsPolicy"
   policy = data.aws_iam_policy_document.github_permissions.json
 }
 

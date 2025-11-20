@@ -5,3 +5,10 @@ variable "region" {
   default     = "eu-west-1"
 
 }
+
+variable "name" {
+  description = "The base name for resources"
+  type        = string
+  default     = "sre-case-study"
+  
+}
