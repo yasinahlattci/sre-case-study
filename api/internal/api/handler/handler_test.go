@@ -6,7 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
+	"io"
+	"log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -73,7 +74,7 @@ func TestHandler_GetItemHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := fiber.New()
 			mockService := new(MockService)
-			h := &Handler{dbService: mockService}
+			h := &Handler{dbService: mockService, logger: log.New(io.Discard, "", 0)}
 
 			mockService.On("GetItem", mock.Anything, tt.objectID).Return(tt.response, tt.err)
 
@@ -117,7 +118,7 @@ func TestHandler_ListItemsHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := fiber.New()
 			mockService := new(MockService)
-			h := &Handler{dbService: mockService}
+			h := &Handler{dbService: mockService, logger: log.New(io.Discard, "", 0)}
 
 			mockService.On("ListItems", mock.Anything).Return(tt.response, tt.err)
 
@@ -168,7 +169,7 @@ func TestHandler_PutItemHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := fiber.New()
 			mockService := new(MockService)
-			h := &Handler{dbService: mockService}
+			h := &Handler{dbService: mockService, logger: log.New(io.Discard, "", 0)}
 
 
 			mockService.On("PutItem", mock.Anything, mock.Anything, mock.Anything).Return(tt.err)
