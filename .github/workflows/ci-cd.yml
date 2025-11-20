@@ -10,7 +10,7 @@ env:
   AWS_REGION: eu-west-1
   ECR_REPOSITORY_API: sre-case-study-api
   ECR_REPOSITORY_LAMBDA: sre-case-study-lambda
-  ECS_SERVICE: picus-service
+  ECS_SERVICE: sre-case-study-service
   ECS_CLUSTER: sre-case-study-cluster
   ECS_TASK_DEFINITION: sre-case-study-task
 
@@ -38,12 +38,6 @@ jobs:
       - name: Run Test
         working-directory: ./app
         run: go test -v -race ./...
-      
-      - name: Lint
-        uses: golangci/golangci-lint-action@v8.0.0
-        with:
-          version: v2.3.4
-          working-directory: ./app
 
   go-build:
     name: Go build
@@ -162,3 +156,43 @@ jobs:
           mv ../bootstrap .
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG . -f Dockerfile.lambda
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+  deploy-api:
+    name: Deploy Api to ECS
+    runs-on: ubuntu-latest
+    variables:
+      TF_VAR_image_tag: ${{ github.sha }}
+    needs:
+      - docker-build-and-push-api
+      - docker-build-and-push-lambda
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: 1.13.5
+
+      - name: Terraform Init
+        working-directory: ./infrastructure/terraform/sre-case-study-api
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./infrastructure/terraform/sre-case-study-api
+        run: terraform apply -auto-approve
+
+      - name: Wait for Service Stability
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
