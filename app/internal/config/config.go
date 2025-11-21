@@ -12,7 +12,8 @@ type Config struct {
 }
 
 type Server struct {
-	Port string
+	Port           string
+	RequestTimeout int
 }
 
 type Database struct {

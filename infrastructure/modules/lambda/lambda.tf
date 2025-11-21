@@ -8,6 +8,7 @@ module "lambda" {
   package_type = "Image"
   create_role = false
   lambda_role = var.lambda_role_arn
+  memory_size = 128
 
   allowed_triggers = {
     alb = {

@@ -8,6 +8,9 @@ module "ecs_cluster" {
     FARGATE_SPOT = {
       weight = 1
     }
+    FARGATE = {
+      weight = 2
+    }
   }
 
 }

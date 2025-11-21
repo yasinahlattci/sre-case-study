@@ -1,5 +1,6 @@
 server:
   port: ":3000"
+  requestTimeout: 5 #seconds
 
 database:
   region: "eu-west-1"

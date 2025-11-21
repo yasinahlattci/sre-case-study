@@ -17,19 +17,21 @@ type ServiceInterface interface {
 type Handler struct {
 	dbService ServiceInterface
 	logger   *log.Logger
+	RequestTimeout int
 }
 
-func NewHandler(s ServiceInterface, logger *log.Logger) *Handler {
+func NewHandler(s ServiceInterface, logger *log.Logger, requestTimeout int) *Handler {
 	return &Handler{
 		dbService: s,
 		logger:    logger,
+		RequestTimeout: requestTimeout,
 	}
 }
 
 func (h *Handler) GetItemHandler(c *fiber.Ctx) error {
 	objectID := c.Params("objectID")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(),time.Duration(h.RequestTimeout)*time.Second )
 	defer cancel()
 
 	value, err := h.dbService.GetItem(ctx, objectID)
@@ -75,7 +77,7 @@ func (h *Handler) PutItemHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(h.RequestTimeout)*time.Second )
 	defer cancel()
 
 	err := h.dbService.PutItem(ctx, objectID, req.Data)
@@ -93,7 +95,7 @@ func (h *Handler) PutItemHandler(c *fiber.Ctx) error {
 
 func (h *Handler) ListItemsHandler(c *fiber.Ctx) error {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(h.RequestTimeout)*time.Second )
 	defer cancel()
 
 	items, err := h.dbService.ListItems(ctx)

@@ -9,12 +9,13 @@ resource "aws_alb_target_group" "api" {
     protocol            = "HTTP"
     matcher             = "200"
     port                = "3000"
-    interval            = 5
-    timeout             = 2
+    interval            = 15
+    timeout             = 3
     healthy_threshold   = 2
-    unhealthy_threshold = 3
-
+    unhealthy_threshold = 2
   }
+  
+  deregistration_delay = 30
 }
 
 resource "aws_alb_target_group" "lambda" {

@@ -13,7 +13,6 @@ func SetupRoutes(app *fiber.App, h *handler.Handler) {
 	api := app.Group("/picus")
 
 	api.Get("list", h.ListItemsHandler)
-	api.Get("get", h.ListItemsHandler)
 
 	api.Post("put", h.PutItemHandler)
 	api.Get("get/:objectID", h.GetItemHandler)

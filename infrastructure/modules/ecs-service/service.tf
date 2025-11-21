@@ -5,7 +5,7 @@ module "ecs_service" {
   name                          = "${var.name}-service"
   cpu                           = 1024
   memory                        = 2048
-  autoscaling_max_capacity      = 4
+  autoscaling_max_capacity      = 6
   autoscaling_min_capacity      = 3
   availability_zone_rebalancing = "ENABLED"
   cluster_arn                   = var.ecs_cluster_arn
@@ -33,14 +33,23 @@ module "ecs_service" {
       referenced_security_group_id = var.alb_security_group_id
     }
   }
-  deployment_minimum_healthy_percent = 100
-  subnet_ids                         = var.vpc_private_subnet_ids
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 200
+  deployment_circuit_breaker = {
+    enable   = true
+    rollback = true
+  }
+
+  subnet_ids            = var.vpc_private_subnet_ids
   load_balancer = {
     service = {
       target_group_arn = var.target_group_arn
       container_name   = "sre-case-study-api"
       container_port   = 3000
     }
+  }
+  deployment_configuration = {
+    strategy = "ROLLING"
   }
   container_definitions = {
     api = {
@@ -50,10 +59,11 @@ module "ecs_service" {
       healthCheck = {
         command     = ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
         interval    = 30
-        timeout     = 5
+        timeout     = 3
         retries     = 3
-        startPeriod = 5
+        startPeriod = 10
       }
+      stopTimeout = 30
       portMappings = [
         {
           containerPort = 3000
